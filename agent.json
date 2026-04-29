@@ -1,0 +1,365 @@
+{
+  "agent_id": "67e0728a-3c02-448c-96cb-da67d8a236ad",
+  "name": "JM Facebook Onborading",
+  "mode": "skills",
+  "deploy_status": "draft",
+  "chat_model": null,
+  "system_prompt": "",
+  "scratchpad": "",
+  "soul": {
+    "persona": "You are Oya, a warm, professional, and efficient onboarding specialist dedicated exclusively to Jumper Media lead onboarding on Messenger. You maintain a friendly but focused tone, keeping conversations moving forward with concise, conversational messages. Your expertise lies in using Google Places data to confirm and verify leads\u2019 GMB listings exactly as they appear, without guessing or paraphrasing. You never discuss topics outside of onboarding, never give opinions, and always respond empathetically and clearly to disqualification scenarios with actionable advice to help leads qualify in the future.",
+    "brand": {},
+    "behavior_rules": [
+      "Use a warm, professional, and concise conversational tone with short messages (max 3\u20134 sentences) and occasional emojis to keep it friendly and approachable.",
+      "Never fabricate or guess any Google My Business data \u2014 always use exact data retrieved from the Google Places API.",
+      "Always confirm the exact full GMB name and address with the lead before performing any qualification checks.",
+      "Conduct qualification checks silently using Google Places data and only mention issues if disqualification occurs, providing clear, empathetic, and actionable guidance.",
+      "Stay strictly on task: only discuss onboarding steps. If the lead raises off-topic questions, acknowledge briefly and redirect back to onboarding.",
+      "Wait for the full business name across multiple messages before searching \u2014 do not run lookup after the first partial message; recheck if additional messages received before replying."
+    ],
+    "welcome_message": "Hey [Name]! I\u2019m Hannah \ud83d\udc4b Give me your business name. Going to look you up to see if we can help"
+  },
+  "skills": [
+    {
+      "skill_id": "current-time",
+      "name": "Time & Date Utilities",
+      "description": "Get current time, convert timezones, calculate date differences, and more",
+      "skill_type": "tool",
+      "category": "general",
+      "catalog_type": "core",
+      "config": {}
+    },
+    {
+      "skill_id": "dataforseo",
+      "name": "DataForSEO",
+      "description": "SEO data suite \u2014 keyword research, on-page analysis, backlinks, domain age, and Google Business Profile",
+      "skill_type": "sandbox",
+      "category": "seo",
+      "catalog_type": "addon",
+      "config": {},
+      "config_schema": {
+        "properties": {
+          "safety_rules": {
+            "type": "text",
+            "group": "rules",
+            "label": "Safety Rules",
+            "description": "Constraints and limits for API usage",
+            "placeholder": "- Max 100 keywords per search volume batch\n- Always confirm before running expensive on-page analysis\n- Cache results when possible"
+          },
+          "keyword_limit": {
+            "type": "number",
+            "group": "defaults",
+            "label": "Keyword Suggestion Limit",
+            "default": 20,
+            "description": "Max keyword suggestions to return per request"
+          },
+          "keyword_rules": {
+            "type": "text",
+            "group": "rules",
+            "label": "Keyword Research Rules",
+            "description": "Rules for keyword research behavior",
+            "placeholder": "- Focus on long-tail keywords with low difficulty\n- Always include search volume and difficulty\n- Group keywords by intent (informational, transactional, navigational)"
+          },
+          "analysis_rules": {
+            "type": "text",
+            "group": "rules",
+            "label": "Analysis Rules",
+            "description": "Rules for on-page and backlink analysis",
+            "placeholder": "- Always check mobile rendering\n- Flag pages with load time > 3s\n- Report missing meta descriptions and H1 tags"
+          },
+          "target_domains": {
+            "type": "text",
+            "group": "defaults",
+            "label": "Target Domains",
+            "description": "Default domains to analyze (one per line)",
+            "placeholder": "example.com\ncompetitor.com"
+          },
+          "report_template": {
+            "type": "text",
+            "group": "templates",
+            "label": "Report Template",
+            "description": "Template for SEO analysis reports",
+            "placeholder": "## SEO Audit: {domain}\n\n### Keywords\n{keywords}\n\n### On-Page\n{onpage}\n\n### Backlinks\n{backlinks}\n\n### Recommendations\n{recommendations}"
+          },
+          "default_language": {
+            "type": "string",
+            "group": "defaults",
+            "label": "Default Language Code",
+            "default": "en",
+            "description": "Language code for API requests",
+            "placeholder": "en"
+          },
+          "default_location": {
+            "type": "string",
+            "group": "defaults",
+            "label": "Default Location",
+            "default": "United States",
+            "description": "Location name for keyword and business data (e.g. United States, Canada, San Diego,California,United States)",
+            "placeholder": "United States"
+          },
+          "include_subdomains": {
+            "type": "boolean",
+            "group": "defaults",
+            "label": "Include Subdomains in Backlinks",
+            "default": true,
+            "description": "Include subdomains when analyzing backlink profiles"
+          },
+          "search_volume_batch_size": {
+            "type": "number",
+            "group": "defaults",
+            "label": "Search Volume Batch Size",
+            "default": 100,
+            "description": "Max keywords per search volume request (API max: 700)"
+          },
+          "enable_javascript_rendering": {
+            "type": "boolean",
+            "group": "defaults",
+            "label": "Enable JS Rendering",
+            "default": true,
+            "description": "Enable JavaScript rendering for on-page analysis (slower but more accurate for SPAs)"
+          }
+        }
+      },
+      "resource_requirements": [
+        {
+          "name": "DataForSEO Login",
+          "env_var": "DATAFORSEO_LOGIN",
+          "description": "DataForSEO account email"
+        },
+        {
+          "name": "DataForSEO Password",
+          "env_var": "DATAFORSEO_PASSWORD",
+          "description": "DataForSEO account password"
+        }
+      ]
+    },
+    {
+      "skill_id": "fetch-url",
+      "name": "Fetch URL",
+      "description": "Fetch and extract content from a web URL \u2014 articles, documentation, links, or API responses",
+      "skill_type": "tool",
+      "category": "general",
+      "catalog_type": "core",
+      "config": {}
+    },
+    {
+      "skill_id": "gmb-lookup",
+      "name": "oya-messenger-onboarding-script",
+      "description": "Search for and retrieve verified Google My Business listings by business name and/or address, returning full details including hours, website, rating, review count, and place ID",
+      "skill_type": "sandbox",
+      "category": "marketing",
+      "catalog_type": "addon",
+      "config": {},
+      "resource_requirements": [
+        {
+          "name": "Google Places API Key",
+          "env_var": "GOOGLE_PLACES_API_KEY",
+          "description": "API key from Google Cloud Console with Places API enabled (console.cloud.google.com > APIs & Services > Credentials)"
+        }
+      ]
+    },
+    {
+      "skill_id": "gmb-qualification-check",
+      "name": "gmb-qualification-check",
+      "description": "Silently validate a Google My Business listing against Jumper Media program thresholds (hours, website, review count, rating) and return the correct disqualification message or a pass result for re-entry and onboarding flows.",
+      "skill_type": "sandbox",
+      "category": "marketing",
+      "catalog_type": "addon",
+      "config": {},
+      "resource_requirements": [
+        {
+          "name": "Google Places API Key",
+          "env_var": "GOOGLE_PLACES_API_KEY",
+          "description": "API key from Google Cloud Console with Places API enabled (used to re-fetch fresh GMB data for returning leads)"
+        }
+      ]
+    },
+    {
+      "skill_id": "jumper-local-onboarding",
+      "name": "jumper-local-onboarding",
+      "description": "Complete the Jumper Local onboarding flow via browser automation: submit GMB business info, fill lead contact details, and send a Calendly booking confirmation to the lead",
+      "skill_type": "sandbox",
+      "category": "sales",
+      "catalog_type": "addon",
+      "config": {}
+    },
+    {
+      "skill_id": "lead-info-collection",
+      "name": "lead-info-collection",
+      "description": "Collects full name, email, and phone number from a qualified lead in strict order during the Oya onboarding flow (Step 4)",
+      "skill_type": "sandbox",
+      "category": "sales",
+      "catalog_type": "addon",
+      "config": {}
+    },
+    {
+      "skill_id": "memory",
+      "name": "Agent Memory",
+      "description": "Remember and recall facts about users and context across conversations, and manage your persistent scratchpad/brain",
+      "skill_type": "tool",
+      "category": "general",
+      "catalog_type": "core",
+      "config": {}
+    },
+    {
+      "skill_id": "oya-messenger-script",
+      "name": "oya-messenger-script",
+      "description": "End-to-end Facebook Messenger onboarding for Jumper Local \u2014 single LLM-facing tool that drives the full SDR script as a Python state machine.",
+      "skill_type": "sandbox",
+      "category": "sales",
+      "catalog_type": "addon",
+      "config": {}
+    },
+    {
+      "skill_id": "rest-api",
+      "name": "REST API Call",
+      "description": "Make HTTP requests to external APIs \u2014 GET, POST, PUT, PATCH, DELETE",
+      "skill_type": "tool",
+      "category": "general",
+      "catalog_type": "core",
+      "config": {}
+    },
+    {
+      "skill_id": "search-kb",
+      "name": "Knowledge Base",
+      "description": "Search the agent's uploaded documents and knowledge base",
+      "skill_type": "tool",
+      "category": "general",
+      "catalog_type": "core",
+      "config": {}
+    },
+    {
+      "skill_id": "text-to-speech",
+      "name": "Text to Speech",
+      "description": "Convert text to speech audio file using gTTS (free, no API key needed)",
+      "skill_type": "sandbox",
+      "category": "voice",
+      "catalog_type": "core",
+      "config": {}
+    },
+    {
+      "skill_id": "web-search",
+      "name": "Web Search",
+      "description": "Search the web for current information, news, and answers",
+      "skill_type": "tool",
+      "category": "general",
+      "catalog_type": "core",
+      "config": {}
+    },
+    {
+      "skill_id": "xano",
+      "name": "Xano",
+      "description": "Query Xano database tables and call custom API endpoints (read-only)",
+      "skill_type": "sandbox",
+      "category": "productivity",
+      "catalog_type": "addon",
+      "config": {},
+      "config_schema": {
+        "properties": {
+          "query_rules": {
+            "type": "text",
+            "group": "rules",
+            "label": "Query Rules",
+            "description": "Rules and constraints for API calls and queries",
+            "placeholder": "- Always paginate results\n- Default sort by created_at desc\n- Include only active records\n- Never expose sensitive columns (password, ssn)"
+          },
+          "result_limit": {
+            "type": "number",
+            "group": "defaults",
+            "label": "Default Result Limit",
+            "default": 50,
+            "description": "Maximum records to return by default"
+          },
+          "default_table": {
+            "type": "string",
+            "group": "defaults",
+            "label": "Default Table",
+            "description": "Default table name for queries",
+            "placeholder": "clients"
+          },
+          "allowed_tables": {
+            "type": "text",
+            "group": "rules",
+            "label": "Allowed Tables",
+            "description": "Tables the agent is allowed to query (one per line, empty = all)",
+            "placeholder": "clients\nprojects\ninvoices"
+          },
+          "endpoint_rules": {
+            "type": "text",
+            "group": "rules",
+            "label": "Endpoint Rules",
+            "description": "Rules for which endpoints to call and when",
+            "placeholder": "- Use /clientSummary for overview requests\n- Use /clientDetails/{id} for individual lookups\n- Always pass authentication params"
+          },
+          "default_endpoint": {
+            "type": "string",
+            "group": "defaults",
+            "label": "Default Endpoint",
+            "description": "Default API endpoint path for call_endpoint",
+            "placeholder": "/clientSummary"
+          },
+          "response_template": {
+            "type": "text",
+            "group": "templates",
+            "label": "Response Template",
+            "description": "Template for formatting query results",
+            "placeholder": "Found {count} records in {table}:\n{results}\n\nShowing page {page} of {total_pages}."
+          },
+          "default_sort_column": {
+            "type": "string",
+            "group": "defaults",
+            "label": "Default Sort Column",
+            "description": "Column to sort by when not specified",
+            "placeholder": "created_at"
+          },
+          "default_sort_direction": {
+            "type": "select",
+            "group": "defaults",
+            "label": "Default Sort Direction",
+            "default": "desc",
+            "options": [
+              "asc",
+              "desc"
+            ],
+            "description": "Sort direction when not specified"
+          }
+        }
+      },
+      "resource_requirements": [
+        {
+          "name": "Xano Instance Domain",
+          "env_var": "XANO_INSTANCE_DOMAIN",
+          "description": "Your Xano instance domain (e.g. xktx-zdsw-4yq2.n7.xano.io)"
+        },
+        {
+          "name": "Xano API Group Base URL",
+          "env_var": "XANO_API_GROUP_BASE_URL",
+          "description": "Full base URL for the API group (e.g. https://xktx-zdsw-4yq2.n7.xano.io/api:F6QZTCZX)"
+        },
+        {
+          "name": "Xano Metadata API Key",
+          "env_var": "XANO_METADATA_API_KEY",
+          "description": "API key for the Xano Metadata API (for table/schema operations). Found in Instance Settings \u2192 Metadata API."
+        },
+        {
+          "name": "Xano Auth Token",
+          "env_var": "XANO_AUTH_TOKEN",
+          "description": "Bearer token for authenticated custom API endpoints (optional, leave blank if endpoints are public)"
+        }
+      ]
+    }
+  ],
+  "gateways": [
+    {
+      "platform": "facebook-messenger",
+      "name": "Facebook Messenger Gateway",
+      "is_active": true
+    }
+  ],
+  "routines": [],
+  "triggers": [],
+  "mcp_connections": [],
+  "memories": [],
+  "knowledge_base": [],
+  "tools_config": {}
+}
